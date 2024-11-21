@@ -1,0 +1,5 @@
+as -o func.o functions.s
+  
+gcc -o test -std=c99 testMudarSprite.c func.o
+
+./test
