@@ -228,84 +228,35 @@ int campoAtivo[60][80] = {
 {0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000, 0b111000000}
 };
 
-// bool verificarColisao(int campo[30][30], Sprite sprite, int direcao, int sentido)
-// {   
-//     //se ta indo pra direita ou esquerda
-//     if (direcao == 1){
-//         //indo pra direita
-//         if (sentido == 1){
-//             if (campo[sprite.coord_x + 1][sprite.coord_y] == 0b111000000){
-//                 return false;   
-//             } else {
-//                 return true;
-//             }
-//           //indo pra esquerda  
-//         } else {
-//             if (campo[sprite.coord_x - 1][sprite.coord_y] == 0b111000000){
-//                 return false;   
-//             } else {
-//                 return true;
-//             }
-//         }        
-//     }
-//     //se ta indo pra cima ou pra baixo 
-//     else {
-//         //ta indo pra pra cima
-//         if (sentido == 1){
-//             if (campo[sprite.coord_x][sprite.coord_y + 1] == 0b111000000){
-//                 return false;   
-//             } else {
-//                 return true;
-//             }
-//           //indo pra baixo  
-//         } else {
-//             if (campo[sprite.coord_x][sprite.coord_y - 1] == 0b111000000){
-//                 return false;   
-//             } else {
-//                 return true;
-//             }
-//         }
-//     }
-// }
+bool verificarColisao(int campo[60][80], Sprite sprite, int direcao, int sentido) {
+    // Converte as coordenadas da sprite (em pixels) para índices da matriz de blocos
+    int blocoX = sprite.coord_x / 8; // 8 pixels por bloco na horizontal
+    int blocoY = sprite.coord_y / 8; // 8 pixels por bloco na vertical
 
-bool verificarColisao(int campo[60][80], Sprite sprite, int direcao, int sentido)
-{   
-    //se ta indo pra direita ou esquerda
-    if (direcao == 1){
-        //indo pra direita
-        if (sentido == 1){
-            if (campo[sprite.coord_x + 1][sprite.coord_y ] == 0b111000000){
+    // Verifica os limites antes de acessar a matriz
+    if (direcao == 1) { // Movimentação horizontal
+        if (sentido == 1) { // Direita
+            if (blocoX + 1 >= 80 || campo[blocoY][blocoX + 1] == 0b111000000) {
                 return false;   
-            } else {
-                return true;
             }
-          //indo pra esquerda  
-        } else {
-            if (campo[sprite.coord_x - 1][sprite.coord_y ] == 0b111000000){
+        } else { // Esquerda
+            if (blocoX - 1 < 0 || campo[blocoY][blocoX - 1] == 0b111000000) {
                 return false;   
-            } else {
-                return true;
             }
-        }        
-    }
-    //se ta indo pra cima ou pra baixo 
-    else {
-        //ta indo pra pra cima
-        if (sentido == 1){
-            if (campo[(sprite.coord_x) ][(sprite.coord_y ) + 1] == 0b111000000){
+        }
+    } else { // Movimentação vertical
+        if (sentido == 1) { // Para baixo
+            if (blocoY + 1 >= 60 || campo[blocoY + 1][blocoX] == 0b111000000) {
                 return false;   
-            } else {
-                return true;
             }
-          //indo pra baixo  
-        } else {
-            if (campo[(sprite.coord_x)][(sprite.coord_y) -1] == 0b111000000){
+        } else { // Para cima
+            if (blocoY - 1 < 0 || campo[blocoY - 1][blocoX] == 0b111000000) {
                 return false;   
-            } else {
-                return true;
             }
         }
     }
+
+    return true; // Sem colisão
 }
 
 
@@ -331,12 +282,15 @@ void desenhaCampo(int campo[60][80]){
     }
 }
 
-void verificaPonto(int campo[60][80], Sprite sprite, int scorePlayer){
-    if (campo[sprite.coord_x][sprite.coord_y] == 0b000111000){
-        scorePlayer += 1;
-        campo[sprite.coord_x][sprite.coord_y] = 0b000000000;
+void verificaPonto(int campo[60][80], Sprite sprite, int *scorePlayer) {
+    int blocoX = sprite.coord_x / 8; // Converter para índice da matriz
+    int blocoY = sprite.coord_y / 8;
+
+    if (campo[blocoY][blocoX] == 0b000111000) {
+        (*scorePlayer)++; // Incrementa o score
+        campo[blocoY][blocoX] = 0b000000000; // Apaga o ponto
     }
-    printf("Pontos: %d", &scorePlayer);
+    printf("Pontos: %d\n", *scorePlayer);
 }
 
 int main(){
@@ -390,13 +344,16 @@ int main(){
 
         sprt_1.ativo = 1; 
         sprt_1.data_register  = 1;  
-        sprt_1.coord_x = 4;  
-        sprt_1.coord_y = 4;  
+        // Inicializa a posição do sprite na posição [4][4] da matriz campoAtivo
+        sprt_1.coord_x = 4 * 8; // Coluna 4 da matriz, convertida para pixels
+        sprt_1.coord_y = 4 * 8; // Linha 4 da matriz, convertida para pixels
+  
         sprt_1.offset = 0;
         //18
         //16
         //set_background_color(0b111,0b000,0b000);
         set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo);
+        printf("Sprite inicializado em: (%d, %d)\n", sprt_1.coord_x, sprt_1.coord_y);
         //set_background_block(18, 16,0b111,0b000,0b111);
     int valor = 1;
     
@@ -473,16 +430,23 @@ int main(){
         } 
 
         //bool verificarColisao(int campo[30][30], Sprite sprite, int direcao, int sentido)
-        if (verificarColisao(campoAtivo, sprt_1, direcao, sentido) == true){
-            if (direcao == 1){
-                sprt_1.coord_x = sprt_1.coord_x + sentido;
-            } else {
-                sprt_1.coord_y = sprt_1.coord_y + sentido;
-            }
-        }
+        // Ajustar a movimentação da sprite e verificar colisões
+if (verificarColisao(campoAtivo, sprt_1, direcao, sentido)) {
+    if (direcao == 1) { // Horizontal
+        sprt_1.coord_x += sentido * 8; // Movimenta 8 pixels por vez
+    } else { // Vertical
+        sprt_1.coord_y += sentido * 8; // Movimenta 8 pixels por vez
+    }
+}
 
-        //verifica se fez ponto e apaga o quadrado do ponto
-        verificaPonto(campoAtivo, sprt_1, scorePlayer);
+// Limitar movimento aos limites da tela
+if (sprt_1.coord_x < 0) sprt_1.coord_x = 0;
+if (sprt_1.coord_x >= 640) sprt_1.coord_x = 639;
+if (sprt_1.coord_y < 0) sprt_1.coord_y = 0;
+if (sprt_1.coord_y >= 480) sprt_1.coord_y = 479;
+
+// Verifica se marcou ponto
+verificaPonto(campoAtivo, sprt_1, &scorePlayer);
 
     }
         // Desabilitar o I2C0 após a operação
