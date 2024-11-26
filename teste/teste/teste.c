@@ -229,28 +229,49 @@ int campoAtivo[60][80] = {
 };
 
 bool verificarColisao(int campo[60][80], Sprite sprite, int direcao, int sentido) {
-    // Converte as coordenadas da sprite (em pixels) para índices da matriz de blocos
-    int blocoX = sprite.coord_x / 8; // 8 pixels por bloco na horizontal
-    int blocoY = sprite.coord_y / 8; // 8 pixels por bloco na vertical
+    // Calcular as coordenadas dos 4 cantos da sprite
+    int cantoSuperiorEsquerdoX = sprite.coord_x;
+    int cantoSuperiorEsquerdoY = sprite.coord_y;
+    int cantoInferiorDireitoX = sprite.coord_x + 16; // 16 pixels de largura, por isso 15
+    int cantoInferiorDireitoY = sprite.coord_y + 16; // 16 pixels de altura, por isso 15
+
+    // Converte as coordenadas dos 4 cantos para índices da matriz de blocos
+    int blocoX1 = cantoSuperiorEsquerdoX / 8;
+    int blocoY1 = cantoSuperiorEsquerdoY / 8;
+    int blocoX2 = cantoInferiorDireitoX / 8;
+    int blocoY2 = cantoInferiorDireitoY / 8;
 
     // Verifica os limites antes de acessar a matriz
+    printf("sprite cordX: %d\n", sprite.coord_x);
+    printf("sprite cordY: %d\n", sprite.coord_y);
+    printf("blocoX1: %d, blocoY1: %d\n", blocoX1, blocoY1);
+    printf("blocoX2: %d, blocoY2: %d\n", blocoX2, blocoY2);
+
     if (direcao == 1) { // Movimentação horizontal
         if (sentido == 1) { // Direita
-            if (blocoX + 1 >= 80 || campo[blocoY][blocoX + 1] == 0b111000000) {
+            // Verifica se a sprite vai colidir com o próximo bloco na direção direita
+            if (blocoX1 + 1 >= 80 || campo[blocoY1][blocoX1 + 1] == 0b111000000 || 
+                blocoX2 + 1 >= 80 || campo[blocoY2][blocoX2 + 1] == 0b111000000) {
                 return false;   
             }
         } else { // Esquerda
-            if (blocoX - 1 < 0 || campo[blocoY][blocoX - 1] == 0b111000000) {
+            // Verifica se a sprite vai colidir com o bloco na direção esquerda
+            if (blocoX1 - 1 < 0 || campo[blocoY1][blocoX1 - 1] == 0b111000000 || 
+                blocoX2 - 1 < 0 || campo[blocoY2][blocoX2 - 1] == 0b111000000) {
                 return false;   
             }
         }
     } else { // Movimentação vertical
         if (sentido == 1) { // Para baixo
-            if (blocoY + 1 >= 60 || campo[blocoY + 1][blocoX] == 0b111000000) {
+            // Verifica se a sprite vai colidir com o próximo bloco na direção para baixo
+            if (blocoY1 + 1 >= 60 || campo[blocoY1 + 1][blocoX1] == 0b111000000 || 
+                blocoY2 + 1 >= 60 || campo[blocoY2 + 1][blocoX2] == 0b111000000) {
                 return false;   
             }
         } else { // Para cima
-            if (blocoY - 1 < 0 || campo[blocoY - 1][blocoX] == 0b111000000) {
+            // Verifica se a sprite vai colidir com o bloco na direção para cima
+            if (blocoY1 - 1 < 0 || campo[blocoY1 - 1][blocoX1] == 0b111000000 || 
+                blocoY2 - 1 < 0 || campo[blocoY2 - 1][blocoX2] == 0b111000000) {
                 return false;   
             }
         }
@@ -258,6 +279,7 @@ bool verificarColisao(int campo[60][80], Sprite sprite, int direcao, int sentido
 
     return true; // Sem colisão
 }
+
 
 
 void desenhaCampo(int campo[60][80]){    
@@ -283,8 +305,8 @@ void desenhaCampo(int campo[60][80]){
 }
 
 void verificaPonto(int campo[60][80], Sprite sprite, int *scorePlayer) {
-    int blocoX = sprite.coord_x / 8; // Converter para índice da matriz
-    int blocoY = sprite.coord_y / 8;
+    int blocoX = (sprite.coord_x + 8) / 8; // Converter para índice da matriz
+    int blocoY = (sprite.coord_y + 8) / 8;
 
     if (campo[blocoY][blocoX] == 0b000111000) {
         (*scorePlayer)++; // Incrementa o score
@@ -345,8 +367,8 @@ int main(){
         sprt_1.ativo = 1; 
         sprt_1.data_register  = 1;  
         // Inicializa a posição do sprite na posição [4][4] da matriz campoAtivo
-        sprt_1.coord_x = 4 * 8; // Coluna 4 da matriz, convertida para pixels
-        sprt_1.coord_y = 4 * 8; // Linha 4 da matriz, convertida para pixels
+        sprt_1.coord_x = 5 * 8; // Coluna 4 da matriz, convertida para pixels
+        sprt_1.coord_y = 1 * 8; // Linha 4 da matriz, convertida para pixels
   
         sprt_1.offset = 0;
         //18
