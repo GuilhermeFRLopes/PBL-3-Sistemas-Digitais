@@ -59,7 +59,7 @@ void *i2c_base;
 Sprite sprt_1;
 Sprite sprt_2;
 int16_t accel_data[3];
-int direcao_fantasma;
+int y_fantasma;
 int sentido_fantasma;
 int sentido;
 int direcao;
@@ -77,7 +77,7 @@ void* read_mouse(void* arg) {
     
     ssize_t n;
     int x, y;
-    int ultimo_x;
+    int ultimo_x, ultimo_y;
    
     
     while (1) {
@@ -92,22 +92,34 @@ void* read_mouse(void* arg) {
 
         pthread_mutex_lock(&lock);
 
-        if (ev.type == EV_REL && ev.code == REL_X) {
-            if(ev.value < 0 && ev.value > -10 ){
-                x_mouse = -1;
-                ultimo_x = ev.value;
-            } else if (ev.value > 0 && ev.value < 10){
-                x_mouse = 1;
-            }else if(ev.value < 0 && ev.value > ultimo_x){
-                x_mouse = 1;
-            }
-            //x_mouse += x;
-            printf("x: %d\n", x_mouse);
-        }
-        if (ev.type == EV_REL && ev.code == REL_Y) {
-            y_mouse = ev.value;
-            ysoma += y;
-            //printf("y: %d\n", y_mouse);
+        // if (ev.type == EV_REL && ev.code == REL_X) {
+        //     if(ev.value < 0 && ev.value > -50 ){
+        //         x_mouse = -1;
+        //         ultimo_x = ev.value;
+        //     } else if (ev.value > 0 && ev.value < 50){
+        //         x_mouse = 1;
+        //     }else if(ev.value < 0 && ev.value > ultimo_x){
+        //         x_mouse = 1;
+        //     } else if (ev.value > 0 && ev.value < ultimo_x)
+        //     {
+        //         x_mouse = -1;
+        //     }
+            
+        //     //x_mouse += x;
+        // }
+         if (ev.type == EV_REL && ev.code == REL_Y) {       
+             if(ev.value < 0 && ev.value > -50 ){
+                 y_mouse = -1;
+                 ultimo_y = ev.value;
+             } else if (ev.value > 0 && ev.value < 50){
+                 y_mouse = 1;
+             }else if(ev.value < 0 && ev.value > ultimo_y){
+                 y_mouse = 1;
+             } else if (ev.value > 0 && ev.value < ultimo_y)
+             {
+                 y_mouse = -1;
+             }
+            printf("y: %d\n", y_mouse);
         }
 
         // Limitar as coordenadas acumuladas para evitar overflow
@@ -124,6 +136,7 @@ void* read_mouse(void* arg) {
 
     return NULL;
 }
+
 
 void *read_accel(void* arg){
 
@@ -772,7 +785,7 @@ int main(){
   
         sprt_1.offset = 0;
 
-        sprt_2.ativo = 0; 
+        sprt_2.ativo = 1; 
         sprt_2.data_register  = 2;  
         // Inicializa a posição do sprite na posição [4][4] da matriz campoAtivo
         sprt_2.coord_x = 35 * 8; // Coluna 4 da matriz, convertida para pixels
@@ -796,7 +809,7 @@ int main(){
     int direcao = 1;
     int sentido = 1;
     int direcao_fantasma = 1;
-    int direcao_fantasma = -1;
+    int sentido_fantasma = 1;
     while(1){
         //desenha o campo
         desenhaCampo(campoAtivo); 
@@ -820,7 +833,31 @@ int main(){
             printf("Clicou");
             direcao = -1;
         } else {
-            direcao = 1;
+            direcao = 1;if (x_mouse < 0)
+        {
+            sentido_fantasma = -1;
+        }
+
+        if (x_mouse > 0)
+        {
+            sentido_fantasma = 1;
+        }
+
+        if (x_mouse == 0){
+            direcao_fantasma = 1;
+        } 
+        else{
+            direcao_fantasma = -1;
+        }
+
+        if (y_mouse < 0)
+            {
+            sentido_fantasma = -1;
+            }
+        if (y_mouse > 0)
+        {
+            sentido_fantasma = 1;
+        }
         }
 
         if (accel_data[2] < -10)
@@ -835,21 +872,28 @@ int main(){
 
         if (x_mouse < 0)
         {
-            sentido_fantasma *= -1;
+            sentido_fantasma = -1;
         }
 
         if (x_mouse > 0)
         {
-            sentido_fantasma *= -1;
+            sentido_fantasma = 1;
+        }
+
+        if (x_mouse == 0){
+            direcao_fantasma = 1;
+        } 
+        else{
+            direcao_fantasma = -1;
         }
 
         if (y_mouse < 0)
             {
-            direcao_fantasma = -1;
+            sentido_fantasma = -1;
             }
         if (y_mouse > 0)
         {
-            direcao_fantasma = 1;
+            sentido_fantasma = 1;
         }
         // Ajustar a movimentação da sprite e verificar colisões
         if (verificarColisao(campoAtivo, sprt_1, direcao, sentido)) {
@@ -862,7 +906,8 @@ int main(){
 
         // Ajustar a movimentação da sprite e verificar colisões
         if (verificarColisao(campoAtivo, sprt_2, direcao_fantasma, sentido_fantasma)) {
-            sprt_2.coord_x += sentido_fantasma * 4; 
+            //sprt_2.coord_x += sentido_fantasma * 4;
+            sprt_2.coord_y += sentido_fantasma * 4; 
             // if (direcao_fantasma == 1) { // Horizontal
             //     sprt_2.coord_x += sentido_fantasma * 4; // Movimenta 8 pixels por vez
             // } else { // Vertical
