@@ -77,45 +77,51 @@ void* read_mouse(void* arg) {
     
     ssize_t n;
     int x, y;
+    int ultimo_x;
+   
+    
+    while (1) {
+        n  = read(fd_mouse, &ev, sizeof(ev));
+        if (n == (ssize_t)-1) {
+            perror("Error reading");
+            continue;
+        } else if (n != sizeof(ev)) {
+            fprintf(stderr, "Error: read %ld bytes, expecting %ld\n", n, sizeof(ev));
+            continue;
+        }
 
-    while (1)
-    {
+        pthread_mutex_lock(&lock);
+
+        if (ev.type == EV_REL && ev.code == REL_X) {
+            if(ev.value < 0 && ev.value > -10 ){
+                x_mouse = -1;
+                ultimo_x = ev.value;
+            } else if (ev.value > 0 && ev.value < 10){
+                x_mouse = 1;
+            }else if(ev.value < 0 && ev.value > ultimo_x){
+                x_mouse = 1;
+            }
+            //x_mouse += x;
+            printf("x: %d\n", x_mouse);
+        }
+        if (ev.type == EV_REL && ev.code == REL_Y) {
+            y_mouse = ev.value;
+            ysoma += y;
+            //printf("y: %d\n", y_mouse);
+        }
+
+        // Limitar as coordenadas acumuladas para evitar overflow
         
-    
-    n  = read(fd_mouse, &ev, sizeof(ev));
-    if (n == (ssize_t)-1) {
-        perror("Error reading");
-    } else if (n != sizeof(ev)) {
-        fprintf(stderr, "Error: read %ld bytes, expecting %ld\n", n, sizeof(ev));
-    }
-
-    pthread_mutex_lock(&lock);
-
-    if (ev.type == EV_REL && ev.code == REL_X) {
-        x_mouse = ev.value;
-        //xsoma += x;
-        printf("x: %d\n", x_mouse);
-    }
-    if (ev.type == EV_REL && ev.code == REL_Y) {
-        y_mouse = ev.value;
-        //ysoma += y;
-        printf("y: %d\n", y_mouse);
-    }
-
-    
-
-
-    // Limitar as coordenadas acumuladas para evitar overflow
-    if (xsoma < 0) xsoma = 0;
-    if (xsoma > 619) xsoma = 619;
-    // if (ev.type == EV_KEY && ev.code == BTN_LEFT && ev.value == 1 && beam.rel_y == 0) {
-    //     click_reset = ev.value;
+        // if (ev.type == EV_KEY && ev.code == BTN_LEFT && ev.value == 1 && beam.rel_y == 0) {
+        //     click_reset = ev.value;
+             if (xsoma < 0) xsoma = 0;
+        if (xsoma > 619) xsoma = 619;
         
-    
-    // }
+        // }
 
-    pthread_mutex_unlock(&lock);
+        pthread_mutex_unlock(&lock);
     }
+
     return NULL;
 }
 
@@ -171,10 +177,10 @@ void *read_accel(void* arg){
         accel_data[i] = (int16_t)((high_byte << 8) | low_byte); // Combinar os dois bytes
     }
 
-    printf("\n------------------------------------\n");
-    printf("Aceleração em X: %d\n", accel_data[0]);
-    printf("Aceleração em Z: %d\n", accel_data[2]);
-    printf("\n------------------------------------\n");
+    // printf("\n------------------------------------\n");
+    // printf("Aceleração em X: %d\n", accel_data[0]);
+    // printf("Aceleração em Z: %d\n", accel_data[2]);
+    // printf("\n------------------------------------\n");
 
     //pthread_mutex_unlock(&lock);
     // descobre o sentido do movimento
@@ -623,11 +629,11 @@ bool verificarColisao(int campo[60][39], Sprite sprite, int direcao, int sentido
     int blocoX2 = cantoInferiorDireitoX / 8;
     int blocoY2 = cantoInferiorDireitoY / 8;
 
-    // Verifica os limites antes de acessar a matriz
-    printf("sprite cordX: %d\n", sprite.coord_x);
-    printf("sprite cordY: %d\n", sprite.coord_y);
-    printf("blocoX1: %d, blocoY1: %d\n", blocoX1, blocoY1);
-    printf("blocoX2: %d, blocoY2: %d\n", blocoX2, blocoY2);
+    // // Verifica os limites antes de acessar a matriz
+    // printf("sprite cordX: %d\n", sprite.coord_x);
+    // printf("sprite cordY: %d\n", sprite.coord_y);
+    // printf("blocoX1: %d, blocoY1: %d\n", blocoX1, blocoY1);
+    // printf("blocoX2: %d, blocoY2: %d\n", blocoX2, blocoY2);
 
     if (direcao == 1) { // Movimentação horizontal
         if (sentido == 1) { // Direita
@@ -695,7 +701,7 @@ void verificaPonto(int campo[60][39], Sprite sprite, int *scorePlayer) {
         campo[blocoY][blocoX] = 0b000000000; // Apaga o ponto
         limpa();
     }
-    printf("Pontos: %d\n", *scorePlayer);
+    //printf("Pontos: %d\n", *scorePlayer);
 }
 
 void desenharSprite(){
@@ -730,10 +736,10 @@ int main(){
             return -1;
         }
 
-        fd_mouse = open("/dev/input/event0", O_RDONLY);
-        if (fd_mouse == -1)
-        {
-            perror("Erro ao abrir /dev/mem");
+        // Abrindo o dispositivo de entrada do mouse
+        fd_mouse = open("/dev/input/event0", O_RDONLY); // Substitua X pelo número correto do seu dispositivo
+        if (fd_mouse == -1) {
+            perror("Erro ao abrir /dev/input/event0");
             return -1;
         }
 
@@ -766,7 +772,7 @@ int main(){
   
         sprt_1.offset = 0;
 
-        sprt_2.ativo = 1; 
+        sprt_2.ativo = 0; 
         sprt_2.data_register  = 2;  
         // Inicializa a posição do sprite na posição [4][4] da matriz campoAtivo
         sprt_2.coord_x = 35 * 8; // Coluna 4 da matriz, convertida para pixels
@@ -777,7 +783,9 @@ int main(){
         //16
         //set_background_color(0b111,0b000,0b000);
         set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo);
-        printf("Sprite inicializado em: (%d, %d)\n", sprt_1.coord_x, sprt_1.coord_y);
+        set_sprite(sprt_2.data_register, sprt_2.coord_x, sprt_2.coord_y, sprt_2.offset, sprt_2.ativo);
+
+        //printf("Sprite inicializado em: (%d, %d)\n", sprt_1.coord_x, sprt_1.coord_y);
         //set_background_block(18, 16,0b111,0b000,0b111);
     int valor = 1;
     
@@ -787,6 +795,8 @@ int main(){
     //sentido -1 = é negativo
     int direcao = 1;
     int sentido = 1;
+    int direcao_fantasma = 1;
+    int direcao_fantasma = -1;
     while(1){
         //desenha o campo
         desenhaCampo(campoAtivo); 
@@ -802,7 +812,8 @@ int main(){
 
 
         pthread_create(&threadMouseMove, NULL, read_mouse, NULL);
-        //pthread_create(&threadAccel, NULL, read_accel, NULL);
+        pthread_create(&threadAccel, NULL, read_accel, NULL);
+
 
         if (*KEY_ptr == 0b1110)
         {
@@ -822,21 +833,21 @@ int main(){
         }
 
 
-        if (x_mouse < -10)
+        if (x_mouse < 0)
         {
-            sentido_fantasma = -1;
+            sentido_fantasma *= -1;
         }
 
-        if (x_mouse > 10)
+        if (x_mouse > 0)
         {
-            sentido_fantasma = 1;
+            sentido_fantasma *= -1;
         }
 
-        if (y_mouse < -10)
+        if (y_mouse < 0)
             {
             direcao_fantasma = -1;
             }
-        if (y_mouse > 10)
+        if (y_mouse > 0)
         {
             direcao_fantasma = 1;
         }
@@ -851,11 +862,12 @@ int main(){
 
         // Ajustar a movimentação da sprite e verificar colisões
         if (verificarColisao(campoAtivo, sprt_2, direcao_fantasma, sentido_fantasma)) {
-            if (direcao == 1) { // Horizontal
-                sprt_2.coord_x += sentido_fantasma * 4; // Movimenta 8 pixels por vez
-            } else { // Vertical
-                sprt_2.coord_y += sentido_fantasma * 4; // Movimenta 8 pixels por vez
-            }
+            sprt_2.coord_x += sentido_fantasma * 4; 
+            // if (direcao_fantasma == 1) { // Horizontal
+            //     sprt_2.coord_x += sentido_fantasma * 4; // Movimenta 8 pixels por vez
+            // } else { // Vertical
+            //     sprt_2.coord_y += sentido_fantasma * 4; // Movimenta 8 pixels por vez
+            // }
         }
 
 
