@@ -8,6 +8,7 @@ extern void set_background_block(uint32_t column, uint32_t line, uint32_t r, uin
 extern void isFull(void);
 extern void setPolygon(int address, int opcode, int color, int form, int mult, int ref_point_x, int ref_point_y);
 extern void set_sprite(int registrador, int x, int y, int offset, int activation_bit);
+extern void set_background_color(int R, int G, int B);
 extern uint32_t open_button(void);
 
 #endif
