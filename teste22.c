@@ -78,6 +78,10 @@ void* read_mouse(void* arg) {
     ssize_t n;
     int x, y;
 
+    while (1)
+    {
+        
+    
     n  = read(fd_mouse, &ev, sizeof(ev));
     if (n == (ssize_t)-1) {
         perror("Error reading");
@@ -89,42 +93,17 @@ void* read_mouse(void* arg) {
 
     if (ev.type == EV_REL && ev.code == REL_X) {
         x_mouse = ev.value;
-        xsoma += x;
-
-
+        //xsoma += x;
         printf("x: %d\n", x_mouse);
     }
     if (ev.type == EV_REL && ev.code == REL_Y) {
         y_mouse = ev.value;
-        ysoma += y;
+        //ysoma += y;
         printf("y: %d\n", y_mouse);
     }
 
-            if (verificarColisao(campoAtivo, sprt_1, direcao, sentido)) {
-            if (direcao == 1) { // Horizontal
-                sprt_1.coord_x += sentido * 4; // Movimenta 8 pixels por vez
-            } else { // Vertical
-                sprt_1.coord_y += sentido * 4; // Movimenta 8 pixels por vez
-            }
-        }
+    
 
-        if (x_mouse < -10)sentido
-            {
-                sentido_fantasma = -1;
-            }
-        if (x_mouse > 10)
-        {
-            sentido_fantasma = 1;
-        }
-
-        if (y_mouse < -10)
-            {
-                direcao_fantasma = -1;
-            }
-        if (y_mouse > 10)
-        {
-            direcao_fantasma = 1;
-        }
 
     // Limitar as coordenadas acumuladas para evitar overflow
     if (xsoma < 0) xsoma = 0;
@@ -136,6 +115,8 @@ void* read_mouse(void* arg) {
     // }
 
     pthread_mutex_unlock(&lock);
+    }
+    return NULL;
 }
 
 void *read_accel(void* arg){
@@ -821,7 +802,7 @@ int main(){
 
 
         pthread_create(&threadMouseMove, NULL, read_mouse, NULL);
-        pthread_create(&threadAccel, NULL, read_accel, NULL);
+        //pthread_create(&threadAccel, NULL, read_accel, NULL);
 
         if (*KEY_ptr == 0b1110)
         {
@@ -839,12 +820,41 @@ int main(){
         {
             sentido = 1;
         }
+
+
+        if (x_mouse < -10)
+        {
+            sentido_fantasma = -1;
+        }
+
+        if (x_mouse > 10)
+        {
+            sentido_fantasma = 1;
+        }
+
+        if (y_mouse < -10)
+            {
+            direcao_fantasma = -1;
+            }
+        if (y_mouse > 10)
+        {
+            direcao_fantasma = 1;
+        }
         // Ajustar a movimentação da sprite e verificar colisões
         if (verificarColisao(campoAtivo, sprt_1, direcao, sentido)) {
             if (direcao == 1) { // Horizontal
                 sprt_1.coord_x += sentido * 4; // Movimenta 8 pixels por vez
             } else { // Vertical
                 sprt_1.coord_y += sentido * 4; // Movimenta 8 pixels por vez
+            }
+        }
+
+        // Ajustar a movimentação da sprite e verificar colisões
+        if (verificarColisao(campoAtivo, sprt_2, direcao_fantasma, sentido_fantasma)) {
+            if (direcao == 1) { // Horizontal
+                sprt_2.coord_x += sentido_fantasma * 4; // Movimenta 8 pixels por vez
+            } else { // Vertical
+                sprt_2.coord_y += sentido_fantasma * 4; // Movimenta 8 pixels por vez
             }
         }
 
