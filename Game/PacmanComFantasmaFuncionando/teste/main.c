@@ -61,7 +61,7 @@ typedef struct
 void *i2c_base;
 Sprite sprt_1;
 Sprite sprt_2;
-int16_t accel_data[3];
+int16_t accel_data[3] = {0,0,0};
 int y_fantasma;
 int x_fantasma;
 int sentido_fantasma;
@@ -93,10 +93,10 @@ bool verificarColisao(int campo[60][39], Sprite sprite, int direcao, int sentido
     int blocoY2 = cantoInferiorDireitoY / 8;
 
     // Verifica os limites antes de acessar a matriz
-    printf("sprite1 cordX: %d\n", sprite.coord_x);
-    printf("sprite1 cordY: %d\n", sprite.coord_y);
-    printf("blocoX1 1: %d, blocoY1: %d\n", blocoX1, blocoY1);
-    printf("blocoX2 1: %d, blocoY2: %d\n\n\n\n", blocoX2, blocoY2);
+    // printf("sprite1 cordX: %d\n", sprite.coord_x);
+    // printf("sprite1 cordY: %d\n", sprite.coord_y);
+    // printf("blocoX1 1: %d, blocoY1: %d\n", blocoX1, blocoY1);
+    // printf("blocoX2 1: %d, blocoY2: %d\n\n\n\n", blocoX2, blocoY2);
 
     if (direcao == 1)
     { // Movimentação horizontal
@@ -431,26 +431,24 @@ void verificaPonto(int campo[60][39], Sprite sprite, int *scorePlayer)
 
 bool verificaColisaoSprite(Sprite sprite1, Sprite sprite2)
 {
+    // Definindo os limites da caixa de colisão para o sprite1
+    int x1_min = sprite1.coord_x;
+    int x1_max = sprite1.coord_x + 16; // largura 16px
+    int y1_min = sprite1.coord_y;
+    int y1_max = sprite1.coord_y + 16; // altura 16px
 
-    int cantoSuperiorEsquerdoX = sprite1.coord_x;
-    int cantoSuperiorEsquerdoY = sprite1.coord_y;
-    int cantoInferiorDireitoX = sprite1.coord_x + 16; // 16 pixels de largura, por isso 15
-    int cantoInferiorDireitoY = sprite1.coord_y + 16; // 16 pixels de altura, por isso 15
+    // Definindo os limites da caixa de colisão para o sprite2
+    int x2_min = sprite2.coord_x;
+    int x2_max = sprite2.coord_x + 16; // largura 16px
+    int y2_min = sprite2.coord_y;
+    int y2_max = sprite2.coord_y + 16; // altura 16px
 
-    int cantoSuperiorEsquerdoX2 = sprite2.coord_x;
-    int cantoSuperiorEsquerdoY2 = sprite2.coord_y;
-    int cantoInferiorDireitoX2 = sprite2.coord_x + 16; // 16 pixels de largura, por isso 15
-    int cantoInferiorDireitoY2 = sprite2.coord_y + 16; // 16 pixels de altura, por isso 15
-
-    if (cantoSuperiorEsquerdoX == cantoSuperiorEsquerdoX2 || cantoSuperiorEsquerdoY == cantoSuperiorEsquerdoY2)
-    {
-        return true;
+    // Verificando se as caixas delimitadoras dos dois sprites se sobrepõem
+    if (x1_max > x2_min && x1_min < x2_max && y1_max > y2_min && y1_min < y2_max) {
+        return true; // Colisão detectada
     }
-    if (cantoInferiorDireitoX == cantoInferiorDireitoX2 || cantoInferiorDireitoY == cantoInferiorDireitoY)
-    {
-        return true;
-    }
-    return false;
+
+    return false; // Sem colisão
 }
 
 void elementoPassivo(){
@@ -517,18 +515,19 @@ int main()
     //Centenas
     desenhaNumero(numeros2[scorePlayer / 100], 50, 15);
 
-    sprt_1.ativo = 0;
+    sprt_1.ativo = 1;
     sprt_1.data_register = 1;
     // Inicializa a posição do sprite na posição [4][4] da matriz campoAtivo
     sprt_1.coord_x = 1 * 8; // Coluna 4 da matriz, convertida para pixels
-    sprt_1.coord_y = 1 * 8; // Linha 4 da matriz, convertida para pixels
+    sprt_1.coord_y = 20
+     * 8; // Linha 4 da matriz, convertida para pixels
 
     sprt_1.offset = 0;
 
     sprt_2.ativo = 1;
     sprt_2.data_register = 2;
     // Inicializa a posição do sprite na posição [4][4] da matriz campoAtivo
-    sprt_2.coord_x = 1 * 8; // Coluna 4 da matriz, convertida para pixels
+    sprt_2.coord_x = 35 * 8; // Coluna 4 da matriz, convertida para pixels
     sprt_2.coord_y = 1 * 8; // Linha 4 da matriz, convertida para pixels
 
     sprt_2.offset = 1;
@@ -547,7 +546,7 @@ int main()
     // sentido 1 = é positivo
     // sentido -1 = é negativo
     int direcao = 1;
-    int sentido = 1;
+    int sentido = 0;
     int direcao_fantasma = 1;
     int sentido_fantasma = 1; // Inicializa o mutex
     pthread_mutex_init(&lock, NULL);
@@ -677,11 +676,13 @@ int main()
 
         if (verificaColisaoSprite(sprt_1, sprt_2))
         {
+            
             hp = 0;
             limpaTudo();
             sprt_1.ativo = 0;
             sprt_2.ativo = 0;
-
+            set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo); // pacman
+            set_sprite(sprt_2.data_register, sprt_2.coord_x, sprt_2.coord_y, sprt_2.offset, sprt_2.ativo); 
             desenha(gameOver, 8, 8);
             sleep(3);
             while (1)
@@ -691,19 +692,24 @@ int main()
                     scorePlayer = 0;
                     hp = 1;
                     sprt_1.ativo = 1;
-                    sprt_2.ativo = 2;
+                    sprt_2.ativo = 1;
+                    sprt_2.coord_x = 35*8;
+                    sprt_2.coord_y = 8;
+                    set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo); // pacman
+                    set_sprite(sprt_2.data_register, sprt_2.coord_x, sprt_2.coord_y, sprt_2.offset, sprt_2.ativo);
                     break;
                 }
             }
 
             // valor = -1;
-            limpaDevagar();
+            limpaTudo();
         }
         verificaPonto(campoAtivo, sprt_1, &scorePlayer);
         if (scorePlayer == 266)
         {
+
             hp = 0;
-            limpaTudo()
+            limpaTudo();
             sprt_1.ativo = 0;
             sprt_2.ativo = 0;
 
@@ -721,7 +727,7 @@ int main()
                     break;
                 }
             }
-            limpaDevagar();
+            limpaTudo();
         }
     }
     // Fechar recursos e limpar
