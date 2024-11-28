@@ -154,7 +154,7 @@ void *function(void *arg)
                 }
                 else if (ev.value == 0)
                 {
-                    direcao_fantasma = 1;
+                    direcao_fant+asma = 1;
                     printf("Botão direito liberado\n");
                 }
             }
