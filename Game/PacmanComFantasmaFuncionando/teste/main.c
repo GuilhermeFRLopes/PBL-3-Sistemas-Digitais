@@ -508,19 +508,15 @@ int main()
     desenhaCampo(campoAtivo);
 
     desenhaS(score, 50, 3);
-    //Unidades
     desenhaNumero(numeros[scorePlayer % 10], 60, 15);
-    //Dezenas
-    desenhaNumero(numeros1[(scorePlayer / 100) % 10], 55, 15);
-    //Centenas
-    desenhaNumero(numeros2[scorePlayer / 100], 50, 15);
+    desenhaNumero(numeros1[(scorePlayer / 10) % 10], 55, 15);
+    desenhaNumero(numeros2[(scorePlayer / 100) % 10] , 50, 15);
 
     sprt_1.ativo = 1;
     sprt_1.data_register = 1;
     // Inicializa a posição do sprite na posição [4][4] da matriz campoAtivo
     sprt_1.coord_x = 1 * 8; // Coluna 4 da matriz, convertida para pixels
-    sprt_1.coord_y = 20
-     * 8; // Linha 4 da matriz, convertida para pixels
+    sprt_1.coord_y = 1 * 8; // Linha 4 da matriz, convertida para pixels  
 
     sprt_1.offset = 0;
 
@@ -552,15 +548,96 @@ int main()
     pthread_mutex_init(&lock, NULL);
 
     // Cria as threads de leitura do mouse e do acelerômetro
+    int cont = 0;
 
     while (hp == 1)
-    {
-        // desenha o campo
-        desenhaCampo(campoAtivo);
+    {   
+        
+        //desenha o campo        
+        switch (cont)
+        {
+        case (5):
+            campoAtivo[42][7] = 0b111000000;
+            cont+=1;
+            break;
+        case (10):
+            campoAtivo[42][8] = 0b111000000;
+            cont+=1;
+            break;
+        case (15):
+            campoAtivo[42][9] = 0b111000000;
+            cont+=1;
+            break;
+        case (20):
+            campoAtivo[42][9] = 0b000000000;
+            cont+=1;
+            break;
+        case (25):
+            campoAtivo[42][8] = 0b000000000;
+            cont+=1;
+            break;
+        case (30):
+            campoAtivo[42][7] = 0b000000000;
+            cont+=1;
+            break;
+        case (35):
+            cont = cont * 0;
+            break;
+        default:-
+            break;
+        }
+        printf("cont: %d\n\n", cont);
+
+        
+        // campoAtivo[42][7] = 0b111000111;
+        // campoAtivo[42][8] = 0b111000111;
+        // campoAtivo[42][9] = 0b111000111;
+        desenhaCampo(campoAtivo);        
         desenhaS(score, 50, 3);
+
+        // if (cont == 50){
+        //     campoAtivo[42][7] = 0b111000000;
+        //     cont+=1;
+        // } else if (cont == 100){
+        //     campoAtivo[42][8] = 0b111000000;
+        //     cont+=1;
+        // } else if (cont == 150){
+        //     campoAtivo[42][9] = 0b111000000;
+        //     cont+=1;
+        // } else if (cont == 200){
+        //     campoAtivo[42][9] = 0b000000000;
+        // } else if (cont == 250){
+        //     campoAtivo[42][8] = 0b000000000;
+        // } else if (cont >= 300){
+        //     campoAtivo[42][7] = 0b000000000;
+        //     cont = 0;
+        // }
+        // printf("cont: %d\n\n", cont);
+        // cont +=1;
+        
+        // if (cont >= 100) {
+
+        //     if (campoAtivo[42][7] == 0b111000000) {
+        //         campoAtivo[42][7] = 0b000000000;
+        //         campoAtivo[42][8] = 0b000111000;
+        //         campoAtivo[42][9] = 0b000000000;
+        //         cont = cont * 0;
+        //     }
+        //     else{
+        //         campoAtivo[42][7] = 0b111000000;
+        //         campoAtivo[42][8] = 0b111000000;
+        //         campoAtivo[42][9] = 0b111000000;
+        //         cont = cont * 0;
+        //     }
+        // }
+        // else {
+        //     printf("cont: %d\n\n", cont);
+        //     cont +=1;
+        // }
+
         desenhaNumero(numeros[scorePlayer % 10], 60, 15);
-        desenhaNumero(numeros1[(scorePlayer / 100) % 10], 55, 15);
-        desenhaNumero(numeros2[scorePlayer / 100], 50, 15);
+        desenhaNumero(numeros1[(scorePlayer / 10) % 10], 55, 15);
+        desenhaNumero(numeros2[(scorePlayer / 100) % 10] , 50, 15);
         // desenhaCampo((campoTeste.cor));
         // desenha o sprite
         set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo); // pacman
@@ -680,7 +757,17 @@ int main()
             hp = 0;
             limpaTudo();
             sprt_1.ativo = 0;
+            sprt_1.coord_x = 1 * 8; // Coluna 4 da matriz, convertida para pixels
+            sprt_1.coord_y = 1 * 8; // Linha 4 da matriz, convertida para pixels 
+
             sprt_2.ativo = 0;
+            sprt_2.coord_x = 35 * 8;
+            sprt_2.coord_y = 1 * 8;
+            for (int i = 0; i < 60; i++){
+                for (int j = 0; j < 39; j++){
+                    campoAtivo[j][i] = campoGame60[j][i];
+                }
+            }
             set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo); // pacman
             set_sprite(sprt_2.data_register, sprt_2.coord_x, sprt_2.coord_y, sprt_2.offset, sprt_2.ativo); 
             desenha(gameOver, 8, 8);
@@ -704,7 +791,13 @@ int main()
             // valor = -1;
             limpaTudo();
         }
+        //sleep(1);
+        // campoAtivo[42][7] = 0b000000000;
+        // campoAtivo[42][8] = 0b000000000;
+        // campoAtivo[42][9] = 0b000000000;
         verificaPonto(campoAtivo, sprt_1, &scorePlayer);
+        cont += 1;
+        //desenhaCampo(campoAtivo); 
         if (scorePlayer == 266)
         {
 
