@@ -614,6 +614,9 @@ int main()
         desenhaNumero(numeros[scoreMenor % 10], 60, 15);
         desenhaNumero(numeros1[(scoreMenor / 10) % 10], 55, 15);
         desenhaNumero(numeros2[(scoreMenor / 100) % 10] , 50, 15);
+    //setPolygon(0, 0b111111000, 1, 3, 200, 1532);
+    //setPolygon(0, 0b111111000, 1, 3, 200, 1532);
+    //1500 [e o do meio]
 
     // desenhaNumero(numeros[scorePlayer % 10], 60, 15);
     // desenhaNumero(numeros1[(scorePlayer / 10) % 10], 55, 15);
@@ -664,10 +667,22 @@ int main()
     //         }
     //int scoreMenor = 0;
     pthread_create(&threadMouseMove, NULL, read_mouse, NULL);
-    while (hp == 1)
+    while (1)
     {   
         
+        
+        if (*KEY_ptr == 0b1101){ // 4 BOTAO
+            hp *= -1;
+            sprt_1.ativo = 1;
+            sprt_2.ativo = 1;
+            set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo);
+            set_sprite(sprt_2.data_register, sprt_2.coord_x, sprt_2.coord_y, sprt_2.offset, sprt_2.ativo);
+            limpaTudo();
+
+        }
+
         //desenha o campo        
+        if(hp == 1){
         switch (cont)
         {
         case (4):
@@ -795,15 +810,15 @@ int main()
         desenhaNumero(numeros[scoreMenor % 10], 60, 15);
         desenhaNumero(numeros1[(scoreMenor / 10) % 10], 55, 15);
         desenhaNumero(numeros2[(scoreMenor / 100) % 10] , 50, 15);
-        setPolygon(0, 0b111111000, 1, 0, 200, 430);
+        //setPolygon(0, 0b111111000, 1, 3, 200, 430);
 
-        // if ((scoreMenor / 100) % 10 != 0){
-        //     setPolygon(0, 0b111111000, 1, 3, 200, 430);
-        // }  if ((scoreMenor / 10) % 10 != 0){
-        //     setPolygon(0, 0b111111000, 1, 3, 200, 500);
-        // }  if (scoreMenor % 10 != 0){
-        //     setPolygon(0, 0b111111000, 1, 3, 200, 600);
-        // }
+        if ((scoreMenor / 100)  != 0){
+            setPolygon(0, 0b111111000, 1, 3, 200, (1500 - 32));
+        } else if ((scoreMenor / 10) != 0){
+            setPolygon(0, 0b111111000, 1, 3, 200, 1500);
+        } else if (scoreMenor != 0){
+            setPolygon(0, 0b111111000, 1, 3, 200, 1532);
+        }
 
         // desenhaCampo((campoTeste.cor));
         // desenha o sprite
@@ -938,6 +953,9 @@ int main()
             set_sprite(sprt_2.data_register, sprt_2.coord_x, sprt_2.coord_y, sprt_2.offset, sprt_2.ativo); 
             //desenha(gameOver, 8, 8);
             desenhaGameOver(pacman_triste);
+            setPolygon(0, 0b111111000, 1, 0, 200, 1532);
+            setPolygon(0, 0b111111000, 1, 0, 200, 1500);
+            setPolygon(0, 0b111111000, 1, 0, 200, (1500 - 32));
             sleep(3);
             while (1)
             {
@@ -969,7 +987,7 @@ int main()
         cont += 1;
         //desenhaCampo(campoAtivo); 
         //total = 265
-        if (scorePlayer == 50)
+        if (scorePlayer == 265)
         {
 
             hp = 0;
@@ -991,6 +1009,9 @@ int main()
 
             // TELA DIFERENTE
             //desenha(pacWin, 8, 8);
+            setPolygon(0, 0b111111000, 1, 0, 200, 1532);
+            setPolygon(0, 0b111111000, 1, 0, 200, 1500);
+            setPolygon(0, 0b111111000, 1, 0, 200, (1500 - 32));
             desenhaFim(pacman_feliz);
             //sleep(3);
             while (1)
@@ -1011,6 +1032,14 @@ int main()
                 }
             }
             limpaTudo();
+        }
+        }
+        else{
+            sprt_1.ativo = 0;
+            sprt_2.ativo = 0;
+            set_sprite(sprt_1.data_register, sprt_1.coord_x, sprt_1.coord_y, sprt_1.offset, sprt_1.ativo);
+            set_sprite(sprt_2.data_register, sprt_2.coord_x, sprt_2.coord_y, sprt_2.offset, sprt_2.ativo);
+            desenha(pauseMatriz, 8, 8);
         }
     }
     // Fechar recursos e limpar
