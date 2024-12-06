@@ -112,7 +112,7 @@ Posto isso a metodologia irá trazer os conceitos que foram acrescidos em relaç
 O jogo desenvolvido foi o PacMan, um dos jogos de arcade mais icônicos e populares de todos os tempos, criado por Toru Iwatani e lançado pela Namco em 1980. O jogo apresenta o personagem principal, Pac-Man, uma figura redonda e amarela, que deve navegar por um labirinto enquanto consome pontos e evita fantasmas. O objetivo é comer todas as pastilhas no labirinto sem ser pego pelos fantasmas.
 <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="imagens/pacman-gaming.gif" alt="Figura 1: PacMan">
-    <p>Figura 1: Campo do Jogo.</p>
+    <p>Figura 1: Pacman</p>
 </div>
 
 - Captura de dados do mouse:
@@ -130,19 +130,19 @@ O jogo desenvolvido foi o PacMan, um dos jogos de arcade mais icônicos e popula
     - O campo do jogo foi desenhado a partir da função de setBackgroundBlock que permite desenhar a partir de uma matriz de pixels, o tamanho do campo foi então uma matriz de 60 linhas e 39 colunas. A matriz é composta por binários de 9 bits que cada 3 bits representa o tom de verde, azul ou vermelho a ser desenhado na tela.
     <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="imagens/tabuleiro.jpg" alt="Figura 1: Jogo em funcionamento.">
-    <p>Figura 1: Campo do Jogo.</p>
+    <p>Figura 2: Campo do Jogo.</p>
 </div>
 
 - Elementos Passivos:
     - O campo do jogo acabou se tornando um elemento passivo, no qual as paredes se movem sem a influência de nenhum jogador. O título do jogo também é um elemento passivo. 
     <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="imagens/passivos.gif" alt="Figura 1: Elementos Passivos.">
-    <p>Figura 2: Poligono.</p>
+    <p>Figura 2: Elementos Passivos</p>
 - Uso do Poligono:
     - O poligono é um dos componentes disponiveis da biblioteca gráfica e foi usada para ilustrar o score.
     <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="imagens/poligono.jpg" alt="Figura 1: Jogo em funcionamento.">
-    <p>Figura 2: Poligono.</p>
+    <p>Figura 4: Poligono.</p>
 
 ## Dificuldades
 No primeiro estágio do desenvolvimento, foi estabelecida a implementação lógica do jogo, juntamente com a criação das matrizes de pixels, o que não apresentou grandes dificuldades. Os primeiros testes foram realizados apenas com o sprite do Pac-Man, que se move por meio do acelerômetro, funcionando corretamente. A complexidade surgiu com a introdução do mouse, momento em que o conhecimento sobre o uso de threads se tornou essencial. O desafio de sincronização foi, então, resolvido por meio do estudo da biblioteca `pthread`, que possibilitou um excelente gerenciamento das threads.
@@ -151,7 +151,7 @@ No primeiro estágio do desenvolvimento, foi estabelecida a implementação lóg
 O projeto alcançou todos os objetivos e requisitos estabelecidos, possuindo uma biblioteca para um processador gráfico funcional, pertimindo a abstração para que o jogo PacMan pudesse ser implementado. A compreensão sobre, conceitos de arquitetura de computadores foi fundamental para a compreensão da arquitetura ArmV7 e suas instruções, conceitos de Sistemas Operacionais, sobre paginação, sobre threads e endereço físico e virtual também foram fundamentais para a conclusão desse projeto.
 
 
-Vídeos do funcionamento do jogo nesse (link)[]
+Vídeos do funcionamento do jogo nesse (link)[https://drive.google.com/drive/folders/1abpvzVofquZNPs8s74ZJE_rAxwmoYrPl?usp=sharing]
 <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="imagens/pacWin.jpg" alt="Figura 1: Jogo em funcionamento." width="300" height="200">
     <p>Figura 3: Tela para vitória do PacMan.</p>
