@@ -160,6 +160,10 @@ Vídeos do funcionamento do jogo nesse (link)[https://drive.google.com/drive/fol
     <img src="imagens/fantasmaWin.jpg" alt="Figura 2: Tela Inicial." width="300" height="200">
     <p>Figura 4: Tela para vitória do Fantasma.</p>
 </div>
+<div style="display: flex; flex-direction: column; align-items: center;">   
+    <img src="imagens/pause.jpg" alt="Figura 2: Tela Inicial." width="300" height="200">
+    <p>Figura 4: Tela de Pause.</p>
+</div>
 
 
 ## Referências
